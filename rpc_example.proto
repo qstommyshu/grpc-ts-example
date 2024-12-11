@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+service rpcExample {
+    rpc UnaryExample (MyRequest) returns (MyResponse);
+
+    rpc ServerStreamExample (MyRequest) returns (stream MyResponse);
+
+    rpc ClientStreamExample (stream MyRequest) returns (MyResponse);
+
+    rpc BidirectionalExample (stream MyRequest) returns (stream MyResponse);
+}
+
+message MyRequest {
+    string name = 1;
+}
+
+message MyResponse {
+    string name = 1;
+}
