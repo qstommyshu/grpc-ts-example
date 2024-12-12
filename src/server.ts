@@ -19,10 +19,10 @@ const unaryExample = (
   callback: sendUnaryData<MyResponse>
 ) => {
   const request = call.request;
-  console.log("[Server] Unary RPC request received: ${request.msg}");
+  console.log("[Server] Unary RPC request received: ", request.msg);
 
   const result: MyResponse = {
-    msg: "This is a unary response from server for unary example!",
+    msg: "server response-unary example",
   };
 
   callback(null, result);
@@ -34,15 +34,15 @@ const serverStreamExample = (
   stream: ServerWritableStream<MyRequest, MyResponse>
 ) => {
   console.log(
-    "[Server] Server-side stream RPC request received: ${stream.request.msg}"
+    "[Server] Server-side stream RPC request received: ",
+    stream.request.msg
   );
 
   for (let i = 0; i < 5; i++) {
     // Send a response every 1 second.
     setTimeout(() => {
-      const response = { msg: `Server-side stream RPC response #${i}` };
+      const response = { msg: `server response #${i}-server stream example` };
       stream.write(response);
-      console.log(`[Server] Server-side stream response sent: ${response.msg}`);
     }, i * 1000);
   }
 
@@ -69,7 +69,7 @@ const clientStreamExample = (
   stream.on("end", () => {
     console.log(`[Server] All ${count} client stream requests received.`);
     const response: MyResponse = {
-      msg: "Client stream example response from server!",
+      msg: "server response: client stream example",
     };
     callback(null, response);
     console.log("[Server] Client stream response sent.");
@@ -83,15 +83,18 @@ const bidirectionalExample = (
   console.log("[Server] Bidirectional stream RPC started.");
 
   let count = 0;
+  let sent = 0;
   stream.on("data", (request: MyRequest) => {
     console.log(
-      `[Server] Received bidirectional stream request: ${request.msg}`
+      `[Server] Received bidirectional stream request with id:${request.id}`
     );
     count++;
 
-    const response = { msg: `Received: ${request.msg}` };
+    const response = {
+      msg: `server response #${count}-bidirectional example`,
+    };
     stream.write(response);
-    console.log(`[Server] Bidirectional stream response sent: ${response.msg}`);
+    sent++;
   });
 
   stream.on("end", () => {
