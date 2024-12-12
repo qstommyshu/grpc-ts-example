@@ -25,12 +25,17 @@ stream.on("status", (status) => {
 });
 
 for (let i = 0; i < 5; i++) {
+  // send a response every 1 sec
   setTimeout(() => {
-    const request: MyRequest = { msg: `stream request #${i}` };
+    const request: MyRequest = {
+      id: i,
+      msg: `bidirectional stream request #${i}`,
+    };
     stream.write(request);
   }, i * 1000);
 }
 
+// end the stream after all response are sent, leave 1 sec as buffer time
 setTimeout(() => {
   stream.end();
 }, 6000);
