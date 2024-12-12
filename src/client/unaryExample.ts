@@ -7,6 +7,7 @@ const client = new rpcExampleClient(
 );
 
 const unaryRequest: MyRequest = {
+  id: 1,
   msg: "This is a unary RPC request message from client!",
 };
 
