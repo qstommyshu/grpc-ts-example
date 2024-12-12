@@ -4,6 +4,8 @@ import {
   sendUnaryData,
   ServerUnaryCall,
   ServerWritableStream,
+  ServerReadableStream,
+  ServerDuplexStream,
 } from "@grpc/grpc-js";
 import {
   MyRequest,
@@ -11,36 +13,114 @@ import {
   rpcExampleService,
 } from "../generated/rpc_example";
 
+// Unary RPC example: Handles a single request and sends a single response.
 const unaryExample = (
   call: ServerUnaryCall<MyRequest, MyResponse>,
   callback: sendUnaryData<MyResponse>
 ) => {
   const request = call.request;
-  console.log(`request name is ${request.name}`);
-  console.log(`[server] unary request received`);
-  const result: MyResponse = { name: "Server unary response" };
+  console.log("[Server] Unary RPC request received: ${request.msg}");
+
+  const result: MyResponse = {
+    msg: "This is a unary response from server for unary example!",
+  };
+
   callback(null, result);
+  console.log("[Server] Unary RPC response sent.");
 };
 
+// Server-side streaming RPC example: Sends multiple responses for a single request.
 const serverStreamExample = (
-  call: ServerWritableStream<MyRequest, MyResponse>
+  stream: ServerWritableStream<MyRequest, MyResponse>
 ) => {
-  const request = call.request;
-  console.log(`[server] server stream request received`);
+  console.log(
+    "[Server] Server-side stream RPC request received: ${stream.request.msg}"
+  );
 
   for (let i = 0; i < 5; i++) {
+    // Send a response every 1 second.
     setTimeout(() => {
-      const response = { name: `server stream ${i}` };
-      call.write(response);
+      const response = { msg: `Server-side stream RPC response #${i}` };
+      stream.write(response);
+      console.log(`[Server] Server-side stream response sent: ${response.msg}`);
     }, i * 1000);
   }
+
+  // End the stream after all responses are sent, with a 1-second buffer.
   setTimeout(() => {
-    call.end();
-  }, 5000);
+    stream.end();
+    console.log("[Server] Server-side stream ended.");
+  }, 6000);
 };
 
+// Client-side streaming RPC example: Receives multiple requests and sends a single response.
+const clientStreamExample = (
+  stream: ServerReadableStream<MyRequest, MyResponse>,
+  callback: sendUnaryData<MyResponse>
+) => {
+  console.log("[Server] Client-side stream RPC request received.");
+
+  let count = 0;
+  stream.on("data", (request: MyRequest) => {
+    console.log(`[Server] Received client stream request: ${request.msg}`);
+    count++;
+  });
+
+  stream.on("end", () => {
+    console.log(`[Server] All ${count} client stream requests received.`);
+    const response: MyResponse = {
+      msg: "Client stream example response from server!",
+    };
+    callback(null, response);
+    console.log("[Server] Client stream response sent.");
+  });
+};
+
+// Bidirectional streaming RPC example: Handles a two-way stream of requests and responses.
+const bidirectionalExample = (
+  stream: ServerDuplexStream<MyRequest, MyResponse>
+) => {
+  console.log("[Server] Bidirectional stream RPC started.");
+
+  let count = 0;
+  stream.on("data", (request: MyRequest) => {
+    console.log(
+      `[Server] Received bidirectional stream request: ${request.msg}`
+    );
+    count++;
+
+    const response = { msg: `Received: ${request.msg}` };
+    stream.write(response);
+    console.log(`[Server] Bidirectional stream response sent: ${response.msg}`);
+  });
+
+  stream.on("end", () => {
+    console.log(
+      `[Server] All ${count} bidirectional stream requests received.`
+    );
+    console.log("[Server] Bidirectional stream ended.");
+    stream.end();
+  });
+
+  stream.on("error", (err: Error) => {
+    console.error("[Server] Bidirectional stream error:", err);
+  });
+
+  stream.on("status", (status) => {
+    console.log("[Server] Status received:", status);
+  });
+};
+
+// Initialize the gRPC server and bind the RPC services.
 const server = new Server();
-server.addService(rpcExampleService, { unaryExample, serverStreamExample });
+server.addService(rpcExampleService, {
+  unaryExample,
+  serverStreamExample,
+  clientStreamExample,
+  bidirectionalExample,
+});
+
+// Start the server on the specified address.
 server.bindAsync("localhost:12138", ServerCredentials.createInsecure(), () => {
-  console.log("Server running at http://localhost:12138");
+  console.log("[Server] Running at http://localhost:12138");
 });
