@@ -28,21 +28,25 @@ import {
 export const protobufPackage = "";
 
 export interface MyRequest {
-  name: string;
+  id: number;
+  msg: string;
 }
 
 export interface MyResponse {
-  name: string;
+  msg: string;
 }
 
 function createBaseMyRequest(): MyRequest {
-  return { name: "" };
+  return { id: 0, msg: "" };
 }
 
 export const MyRequest: MessageFns<MyRequest> = {
   encode(message: MyRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.msg !== "") {
+      writer.uint32(18).string(message.msg);
     }
     return writer;
   },
@@ -55,11 +59,19 @@ export const MyRequest: MessageFns<MyRequest> = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1: {
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.name = reader.string();
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.msg = reader.string();
           continue;
         }
       }
@@ -72,13 +84,19 @@ export const MyRequest: MessageFns<MyRequest> = {
   },
 
   fromJSON(object: any): MyRequest {
-    return { name: isSet(object.name) ? globalThis.String(object.name) : "" };
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      msg: isSet(object.msg) ? globalThis.String(object.msg) : "",
+    };
   },
 
   toJSON(message: MyRequest): unknown {
     const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.msg !== "") {
+      obj.msg = message.msg;
     }
     return obj;
   },
@@ -88,19 +106,20 @@ export const MyRequest: MessageFns<MyRequest> = {
   },
   fromPartial<I extends Exact<DeepPartial<MyRequest>, I>>(object: I): MyRequest {
     const message = createBaseMyRequest();
-    message.name = object.name ?? "";
+    message.id = object.id ?? 0;
+    message.msg = object.msg ?? "";
     return message;
   },
 };
 
 function createBaseMyResponse(): MyResponse {
-  return { name: "" };
+  return { msg: "" };
 }
 
 export const MyResponse: MessageFns<MyResponse> = {
   encode(message: MyResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
+    if (message.msg !== "") {
+      writer.uint32(10).string(message.msg);
     }
     return writer;
   },
@@ -117,7 +136,7 @@ export const MyResponse: MessageFns<MyResponse> = {
             break;
           }
 
-          message.name = reader.string();
+          message.msg = reader.string();
           continue;
         }
       }
@@ -130,13 +149,13 @@ export const MyResponse: MessageFns<MyResponse> = {
   },
 
   fromJSON(object: any): MyResponse {
-    return { name: isSet(object.name) ? globalThis.String(object.name) : "" };
+    return { msg: isSet(object.msg) ? globalThis.String(object.msg) : "" };
   },
 
   toJSON(message: MyResponse): unknown {
     const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
+    if (message.msg !== "") {
+      obj.msg = message.msg;
     }
     return obj;
   },
@@ -146,7 +165,7 @@ export const MyResponse: MessageFns<MyResponse> = {
   },
   fromPartial<I extends Exact<DeepPartial<MyResponse>, I>>(object: I): MyResponse {
     const message = createBaseMyResponse();
-    message.name = object.name ?? "";
+    message.msg = object.msg ?? "";
     return message;
   },
 };

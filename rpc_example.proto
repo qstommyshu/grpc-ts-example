@@ -11,9 +11,10 @@ service rpcExample {
 }
 
 message MyRequest {
-    string name = 1;
+    int32 id = 1;
+    string msg = 2;
 }
 
 message MyResponse {
-    string name = 1;
+    string msg = 1;
 }
