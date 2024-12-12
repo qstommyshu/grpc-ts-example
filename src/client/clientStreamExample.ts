@@ -30,7 +30,7 @@ console.log(`[Client] sending requests...`);
 for (let i = 0; i < 5; i++) {
   // send a response every 1 sec
   setTimeout(() => {
-    const request: MyRequest = { msg: `client stream request #${i}` };
+    const request: MyRequest = { id: i, msg: `client stream request #${i}` };
     stream.write(request);
   }, i * 1000);
 }
