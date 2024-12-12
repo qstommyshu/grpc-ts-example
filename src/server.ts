@@ -93,8 +93,11 @@ const bidirectionalExample = (
     const response = {
       msg: `server response #${count}-bidirectional example`,
     };
-    stream.write(response);
-    sent++;
+    // send response 0.5 sec after receiving request
+    setTimeout(() => {
+      stream.write(response);
+      sent++;
+    }, 500);
   });
 
   stream.on("end", () => {
