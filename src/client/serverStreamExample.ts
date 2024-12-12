@@ -11,6 +11,7 @@ const client = new rpcExampleClient(
 );
 
 const serverStreamRequest: MyRequest = {
+  id: 1,
   msg: "This is a server side stream RPC request message from client!",
 };
 
