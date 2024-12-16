@@ -12,7 +12,7 @@
     "server": "npx ts-node src/server.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tommy Shu",
   "license": "ISC",
   "description": "",
   "dependencies": {
