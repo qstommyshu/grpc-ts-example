@@ -1,4 +1,4 @@
-import { ServiceError, credentials } from "@grpc/grpc-js";
+import { credentials } from "@grpc/grpc-js";
 import { MyRequest, rpcExampleClient } from "../../generated/rpc_example";
 
 const client = new rpcExampleClient(
@@ -11,7 +11,7 @@ const unaryRequest: MyRequest = {
   msg: "This is a unary RPC request message from client!",
 };
 
-client.unaryExample(unaryRequest, (err: ServiceError | null, response) => {
+client.unaryExample(unaryRequest, (err, response) => {
   if (err) {
     console.error(`[Client] unary RPC error: ${err}`);
   } else {
