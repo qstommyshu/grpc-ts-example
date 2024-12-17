@@ -1,4 +1,4 @@
-import { credentials } from "@grpc/grpc-js";
+import { credentials, ClientWritableStream } from "@grpc/grpc-js";
 import { MyRequest, rpcExampleClient } from "../../generated/rpc_example";
 
 const client = new rpcExampleClient(
@@ -6,15 +6,17 @@ const client = new rpcExampleClient(
   credentials.createInsecure()
 );
 
-const stream = client.clientStreamExample((error, response) => {
-  if (error) {
-    console.error(`[Client] client side stream RPC error: ${error}`);
-  } else {
-    console.log(
-      `[Client] client side stream RPC response received: ${response.msg}`
-    );
+const stream: ClientWritableStream<MyRequest> = client.clientStreamExample(
+  (error, response) => {
+    if (error) {
+      console.error(`[Client] client side stream RPC error: ${error}`);
+    } else {
+      console.log(
+        `[Client] client side stream RPC response received: ${response.msg}`
+      );
+    }
   }
-});
+);
 
 // no stream.on("data") because server response is not send through stream in this case
 
