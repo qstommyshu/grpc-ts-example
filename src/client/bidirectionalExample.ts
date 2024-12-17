@@ -1,4 +1,4 @@
-import { credentials } from "@grpc/grpc-js";
+import { credentials, ClientDuplexStream } from "@grpc/grpc-js";
 import {
   MyRequest,
   MyResponse,
@@ -10,7 +10,8 @@ const client = new rpcExampleClient(
   credentials.createInsecure()
 );
 
-const stream = client.bidirectionalExample();
+const stream: ClientDuplexStream<MyRequest, MyResponse> =
+  client.bidirectionalExample();
 
 stream.on("data", (response: MyResponse) => {
   console.log(`Received response from server: ${response.msg}`);
