@@ -1,4 +1,4 @@
-import { ServiceError, credentials } from "@grpc/grpc-js";
+import { ServiceError, credentials, ClientReadableStream } from "@grpc/grpc-js";
 import {
   MyRequest,
   MyResponse,
@@ -10,12 +10,13 @@ const client = new rpcExampleClient(
   credentials.createInsecure()
 );
 
-const serverStreamRequest: MyRequest = {
+const request: MyRequest = {
   id: 1,
   msg: "This is a server side stream RPC request message from client!",
 };
 
-const stream = client.serverStreamExample(serverStreamRequest);
+const stream: ClientReadableStream<MyResponse> =
+  client.serverStreamExample(request);
 
 let count = 0;
 console.log(`[Client] receiving server side stream: `);
